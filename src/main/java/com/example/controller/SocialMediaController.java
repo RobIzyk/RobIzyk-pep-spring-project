@@ -39,15 +39,15 @@ public class SocialMediaController {
         String password = account.getPassword();
  
         if (username == null || username.isBlank() || password == null || password.length() < 4) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // 400
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
  
         if (accountService.findByUsername(username).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
  
         Account savedAccount = accountService.save(account);
-        return ResponseEntity.ok(savedAccount); // 200
+        return ResponseEntity.ok(savedAccount);
     }
  
     /**
@@ -60,11 +60,11 @@ public class SocialMediaController {
         if (optionalAccount.isPresent()) {
             Account existing = optionalAccount.get();
             if (existing.getPassword().equals(account.getPassword())) {
-                return ResponseEntity.ok(existing); // 200
+                return ResponseEntity.ok(existing);
             }
         }
  
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
  
     /**
@@ -101,7 +101,7 @@ public class SocialMediaController {
     public ResponseEntity<Message> getMessageById(@PathVariable int messageId) {
         return messageService.findById(messageId)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.ok(null)); // empty body, but 200
+                .orElse(ResponseEntity.ok(null));
     }
  
     /**
@@ -109,10 +109,15 @@ public class SocialMediaController {
     * Delete a message by ID
     */
     @DeleteMapping("/messages/{id}")
-    public ResponseEntity<?> deleteMessage(@PathVariable int id) {
+    public ResponseEntity<String> deleteMessage(@PathVariable int id) {
         boolean deleted = messageService.deleteById(id);
-        return deleted ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (deleted) {
+            return ResponseEntity.ok("1");
+        } else {
+            return ResponseEntity.ok().build();
+        }
     }
+
  
     /**
     * PATCH /messages/{id}
@@ -133,7 +138,7 @@ public class SocialMediaController {
         if (updated != null) {
             return ResponseEntity.ok("1");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Message not found");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Message not found");
         }
     }
  
